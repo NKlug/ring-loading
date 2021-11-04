@@ -3,7 +3,6 @@ import numpy as np
 from demands_across_cuts import compute_demands_across_cuts, naive_compute_demands_across_cuts
 from generate_instance import generate_random_instance
 from relaxed_ring_loading import compute_capacities
-from symmetric_matrix import SymmetricMatrix
 
 if __name__ == '__main__':
     n = 100
