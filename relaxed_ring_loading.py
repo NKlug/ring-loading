@@ -5,6 +5,8 @@ from symmetric_matrix import SymmetricMatrix
 from utils import crange
 
 UNROUTED = -1
+FORWARD = 1
+BACKWARD = 0
 
 
 def relaxed_ring_loading(n, demands):
@@ -19,8 +21,8 @@ def relaxed_ring_loading(n, demands):
     S = find_unrouted_demands(n, routing)
 
     # Route remaining demands by splitting
-    routing = route_crossing_demands(n, routing, S, demands)
-    return routing, S
+    # routing = route_crossing_demands(n, routing, S, demands)
+    return routing, S, capacities
 
 
 def route_crossing_demands(n, routing, S, demands):
@@ -29,7 +31,7 @@ def route_crossing_demands(n, routing, S, demands):
     for (i, j) in S:
         c_max_front = np.min(residual_capacities[i:j])
         if demands[i, j] < c_max_front:
-            routing[i, j] = 1
+            routing[i, j] = FORWARD
             residual_capacities[i:j] -= demands[i, j]
         else:
             routing[i, j] = c_max_front / demands[i, j]
@@ -67,16 +69,16 @@ def route_parallel_demands(n, tight_cuts):
         i, j = min(l, j), max(l, j)
         # route demands in (i, j] through the front
         for k in crange(i + 2, j + 1, n):
-            routing[i + 1, k] = 1
+            routing[i + 1, k] = FORWARD
 
         # route demands in (j, i] through the back
         # we have to take care of some special cases, as (j+1) = n is possible
         # demands ending in (j, n-1]
         for k in crange(j + 2, n, n):
-            routing[(j + 1) % n, k] = 0
+            routing[(j + 1) % n, k] = BACKWARD
         # demands ending in [0, i]
         for k in crange(max(0, (j + 1) % n), i + 1, n):
-            routing[(j + 1) % n, k] = 0
+            routing[(j + 1) % n, k] = BACKWARD
     return routing
 
 
