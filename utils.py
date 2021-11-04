@@ -6,8 +6,12 @@ def crange(start, stop, modulo):
     :param modulo:
     :return:
     """
-    assert stop <= modulo
-    index = start % modulo
+    # return nothing if start >= modulo
+    if start >= modulo:
+        return
+    # get stop in bounds if necessary
+    stop = stop % modulo
+    index = start
     while index != stop:
         yield index
         index = (index + 1) % modulo
