@@ -2,11 +2,11 @@ import numpy as np
 
 
 class SymmetricMatrix(np.ndarray):
-    def __new__(cls, n, input_array=None, dtype=np.float32, *args, **kwargs):
-        if input_array is None:
+    def __new__(cls, n, initial_values=None, dtype=np.float32, *args, **kwargs):
+        if initial_values is None:
             obj = np.zeros((n, n), dtype=dtype)
-        elif input_array.shape == 2 and np.allclose(input_array, input_array.T, rtol=1e-05, atol=1e-08):
-            obj = np.asarray(input_array)
+        elif len(initial_values.shape) == 2 and np.allclose(initial_values, initial_values.T):
+            obj = np.asarray(initial_values)
         else:
             raise Exception("Class SymmetricMatrix can only be initialized with a symmetric matrix!")
         return obj.view(cls)
