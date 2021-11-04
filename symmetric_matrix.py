@@ -2,27 +2,39 @@ import numpy as np
 
 
 class SymmetricMatrix:
+    """
+    Datatype for memory-efficient storing of symmetric matrices.
+    """
     _n: int
     _values: np.array
+    dtype: type or np.dtype
 
-    def __init__(self, n, initial_values_array=None, dtype=np.float):
+    def __init__(self, n, initial_values=None, dtype=np.float):
         """
 
         :type dtype: datatype
         """
         self._n = n
-        self._values = np.zeros((n*(n-1)//2,), dtype=dtype)
-        if initial_values_array:
-            self._values[:] = initial_values_array
-
-    def _get_index(self, index_tuple):
-        row, column = min(index_tuple), max(index_tuple)
-        return row * (row + 1) // 2 + column
+        self._values = np.zeros((n, n), dtype=dtype)
+        self.dtype = dtype
+        if initial_values is not None:
+            if len(initial_values.shape) == 2:
+                assert initial_values.shape == (n, n)
+                self._values[:] = initial_values
+            else:
+                raise Exception("Initial values has improper shape!")
 
     def __setitem__(self, key, value):
-        index = self._get_index(key)
-        self._values[index] = value
+        self._values[key] = value
+        self._values[key[::-1]] = value
 
     def __getitem__(self, key):
-        index = self._get_index(key)
-        return self._values[index]
+        return self._values[key]
+
+    def __str__(self):
+        return str(self._values)
+
+    def __eq__(self, other):
+        if isinstance(other, SymmetricMatrix):
+            return self._values == other._values
+        return False
