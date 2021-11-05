@@ -15,7 +15,7 @@ def compute_residual_capacities(n, routing, demands, old_capacities):
 
     # k = n, O(n^2)
     for i in range(0, n - 1):
-        backward_loads[-1] += cond_sum(demands[i, i + 1:], routing[i, i + 1], BACKWARD)
+        backward_loads[-1] += cond_sum(demands[i, i + 1:], routing[i, i + 1:], BACKWARD)
 
     for k in range(0, n - 1):
         backward_loads[k] = backward_loads[k - 1] - cond_sum(demands[:k, k], routing[:k, k], BACKWARD) \

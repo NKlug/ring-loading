@@ -22,7 +22,7 @@ def relaxed_ring_loading(n, demands):
 
     # Route remaining demands by splitting
     # routing = route_crossing_demands(n, routing, S, demands)
-    return routing, S, capacities
+    return routing, S, capacities, demands_across_cuts, tight_cuts
 
 
 def route_crossing_demands(n, routing, S, demands):
@@ -59,6 +59,58 @@ def find_parallel_demands(S):
     return parallel_demands
 
 
+def route_parallel_demands_with_capacities(n, tight_cuts, capacities, demands):
+    routing = SymmetricMatrix(n, initial_values=np.full((n, n), UNROUTED))
+    # for each tight cut, route some parallel demands
+    # TODO: can be further optimized: when computing tight cuts, try to get as few as possible
+    # TODO: only iterate over distinct tight cuts
+    for l in range(n):
+        j = tight_cuts[l]
+        i, j = min(l, j), max(l, j)
+        # route demands in (i, j] through the front (we have i < j)
+        for k in crange(i + 2, j + 1, n):
+            if routing[i+1, k] == UNROUTED:
+                capacities = decrease_capacities(n, capacities, demands[i + 1, k], i + 1, k, FORWARD)
+            routing[i + 1, k] = FORWARD
+
+        # route demands in (j, i] such that they miss the links [i, j)
+        for k in crange((j + 2) % n, i + 1, n):
+            start = (j + 1) % n
+            route = determine_route(start, k)
+            if routing[start, k] == UNROUTED:
+                capacities = decrease_capacities(n, capacities, demands[start, k], start, k, route)
+            routing[start, k] = route
+
+    return routing, capacities
+
+
+def determine_route(j, k):
+    """
+    Choose routing according to the relation of j and k. If j < k, route forward, if k < j, route backward.
+    :param j:
+    :param k:
+    :return:
+    """
+    assert j != k
+    if j < k:
+        return FORWARD
+    else:
+        return BACKWARD
+
+
+def decrease_capacities(n, capacities, demand, i, j, route):
+    if route == FORWARD:
+        i, j = min(i, j), max(i, j)
+    elif route == BACKWARD:
+        i, j = max(i, j), min(i, j)
+    else:
+        raise Exception("Bad route!")
+    for k in crange(i, j, n):
+        capacities[k] -= demand
+        assert capacities[k] >= 0
+    return capacities
+
+
 def route_parallel_demands(n, tight_cuts):
     routing = SymmetricMatrix(n, initial_values=UNROUTED * np.ones((n, n)))
     # for each tight cut, route some parallel demands
@@ -71,14 +123,11 @@ def route_parallel_demands(n, tight_cuts):
         for k in crange(i + 2, j + 1, n):
             routing[i + 1, k] = FORWARD
 
-        # route demands in (j, i] through the back
-        # we have to take care of some special cases, as (j+1) = n is possible
-        # demands ending in (j, n-1]
-        for k in crange(j + 2, n, n):
-            routing[(j + 1) % n, k] = BACKWARD
-        # demands ending in [0, i]
-        for k in crange(max(0, (j + 1) % n), i + 1, n):
-            routing[(j + 1) % n, k] = BACKWARD
+        # route demands in (j, i] such that they miss the links [i, j)
+        for k in crange((j + 2) % n, i + 1, n):
+            start = (j + 1) % n
+            routing[start, k] = determine_route(start, k)
+
     return routing
 
 
