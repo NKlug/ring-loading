@@ -3,7 +3,7 @@ import numpy as np
 from check_cut_condition import check_cut_condition
 from generate_instance import generate_random_instance
 from relaxed_ring_loading import relaxed_ring_loading
-from residual_capacities import naive_compute_residual_capacities, compute_residual_capacities
+from residual_capacities import naive_compute_residual_capacities, compute_residual_capacities, naive_compute_loads
 
 if __name__ == '__main__':
     n = 100
