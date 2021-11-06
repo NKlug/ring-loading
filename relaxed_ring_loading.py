@@ -1,12 +1,10 @@
 import numpy as np
 
+from constants import FORWARD, UNROUTED, BACKWARD
 from demands_across_cuts import compute_demands_across_cuts
+from residual_capacities import naive_compute_residual_capacities
 from symmetric_matrix import SymmetricMatrix
 from utils import crange
-
-UNROUTED = -1
-FORWARD = 1
-BACKWARD = 0
 
 
 def partial_integer_routing(n, demands):
@@ -36,9 +34,12 @@ def relaxed_ring_loading(n, demands):
     :param demands:
     :return:
     """
+    # determine partial integer routing, set of unrouted demands S and capacities
     pi_routing, S, capacities, _, _ = partial_integer_routing(n, demands)
+    # compute residual capacities
+    residual_capacities = naive_compute_residual_capacities(n, pi_routing, demands, capacities)
     # Route remaining demands by splitting
-    routing = route_crossing_demands(n, partial_integer_routing, S, demands)
+    routing = route_crossing_demands(n, pi_routing, S, demands, residual_capacities)
 
     return routing
 
@@ -47,7 +48,7 @@ def naive_relaxed_ring_loading(n, demands):
     pass
 
 
-def route_crossing_demands(n, routing, S, demands):
+def route_crossing_demands(n, routing, S, demands, residual_capacities):
     """
 
     :param n:
@@ -56,19 +57,18 @@ def route_crossing_demands(n, routing, S, demands):
     :param demands:
     :return:
     """
-    residual_capacities = []
-
     # TODO: Check conjecture: There are only crossing demands in S (and maybe adapt if untrue)
     for (i, j) in S:
-        c_max_front = np.min(residual_capacities[i:j])
-        if demands[i, j] < c_max_front:
+        i, j = min(i, j), max(i, j)
+        c_min_front = np.min(residual_capacities[i:j])
+        if demands[i, j] < c_min_front:
             routing[i, j] = FORWARD
             residual_capacities[i:j] -= demands[i, j]
         else:
-            routing[i, j] = c_max_front / demands[i, j]
-            residual_capacities[i:j] -= c_max_front
-            residual_capacities[:i] -= demands[i, j] - c_max_front
-            residual_capacities[j:] -= demands[i, j] - c_max_front
+            routing[i, j] = c_min_front / demands[i, j]
+            residual_capacities[i:j] -= c_min_front
+            residual_capacities[:i] -= demands[i, j] - c_min_front
+            residual_capacities[j:] -= demands[i, j] - c_min_front
     return routing
 
 

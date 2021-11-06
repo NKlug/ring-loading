@@ -1,6 +1,6 @@
 import numpy as np
 
-from relaxed_ring_loading import FORWARD, BACKWARD
+from constants import FORWARD, BACKWARD
 
 
 def compute_residual_capacities(n, routing, demands, old_capacities):
@@ -35,17 +35,17 @@ def compute_residual_capacities(n, routing, demands, old_capacities):
     return old_capacities - total_loads
 
 
-def naive_compute_residual_capacities(n, routing, demands, old_capacities):
+def naive_compute_residual_capacities(n, routing, demands, prior_capacities):
     """
     A O(n^3) algorithm for computing the residual capacities
     :param n:
     :param routing:
     :param demands:
-    :param old_capacities:
+    :param prior_capacities:
     :return:
     """
     forward_loads, backward_loads = naive_compute_loads(n, routing, demands)
-    return old_capacities - (forward_loads + backward_loads)
+    return prior_capacities - (forward_loads + backward_loads)
 
 
 def naive_compute_loads(n, routing, demands):
@@ -63,10 +63,9 @@ def naive_compute_loads(n, routing, demands):
         for i in range(0, n - 1):
             for j in range(i + 1, n):
                 if demand_routed_through_link((i, j), k, routing[i, j]):
-                    if routing[i, j] == FORWARD:
-                        forward_loads[k] += demands[i, j]
-                    elif routing[i, j] == BACKWARD:
-                        backward_loads[k] += demands[i, j]
+                    if 0 <= routing[i, j] <= 1:
+                        forward_loads[k] += demands[i, j] * routing[i, j]
+                        backward_loads[k] += demands[i, j] * (1 - routing[i, j])
 
     return forward_loads, backward_loads
 

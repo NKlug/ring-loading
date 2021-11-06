@@ -6,7 +6,7 @@ from relaxed_ring_loading import partial_integer_routing, relaxed_ring_loading
 from residual_capacities import naive_compute_residual_capacities, compute_residual_capacities, naive_compute_loads
 
 if __name__ == '__main__':
-    n = 100
+    n = 10
     demands = generate_random_instance(n=n, max_demand=100, sparsity=0.3, integer=True, seed=0)
     # demands = SymmetricMatrix(n, np.ones((n, n), dtype=np.float32) - np.diag(np.zeros(n)))
     pi_routing, S, capacities, demands_across_cuts, tight_cuts = partial_integer_routing(n, demands)
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     print(
         f"Naive residual capacities equal to residual capacities: {np.allclose(naive_res_capacities, res_capacities)}")
 
-    # routing = relaxed_ring_loading(n, capacities)
-    # res_capacities = compute_residual_capacities(n)
-
+    routing = relaxed_ring_loading(n, demands)
+    res_capacities = naive_compute_residual_capacities(n, routing, demands, capacities)
+    print(f"Total residual capacities: {res_capacities}")
     pass
