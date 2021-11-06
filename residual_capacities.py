@@ -44,20 +44,13 @@ def naive_compute_residual_capacities(n, routing, demands, old_capacities):
     :param old_capacities:
     :return:
     """
-    loads = np.zeros((n,))
-
-    for k in range(n):
-        for i in range(0, n - 1):
-            for j in range(i + 1, n):
-                if demand_routed_through_link((i, j), k, routing[i, j]):
-                    loads[k] += demands[i, j]
-
-    return old_capacities - loads
+    forward_loads, backward_loads = naive_compute_loads(n, routing, demands)
+    return old_capacities - (forward_loads + backward_loads)
 
 
 def naive_compute_loads(n, routing, demands):
     """
-    A O(n^3) algorithm for computing the residual capacities
+    A O(n^3) algorithm for computing the residual capacities.
     :param n:
     :param routing:
     :param demands:
@@ -84,5 +77,4 @@ def demand_routed_through_link(ij, k, route):
 
 
 def cond_sum(demand_array, routing_array, c):
-    assert demand_array.shape == routing_array.shape
     return np.sum(demand_array[np.where(routing_array == c)[0]])

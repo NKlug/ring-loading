@@ -9,25 +9,56 @@ FORWARD = 1
 BACKWARD = 0
 
 
-def relaxed_ring_loading(n, demands):
+def partial_integer_routing(n, demands):
+    """
+
+    :param n:
+    :param demands:
+    :return:
+    """
     demands_across_cuts = compute_demands_across_cuts(n, demands)
     capacities = compute_capacities(n, demands_across_cuts)
     tight_cuts = find_tight_cuts(n, demands_across_cuts, capacities)
 
     # route all demands that are
-    routing = route_parallel_demands(n, tight_cuts)
+    pi_routing = route_parallel_demands(n, tight_cuts)
 
     # Find indices of unrouted demands
-    S = find_unrouted_demands(n, routing)
+    S = find_unrouted_demands(n, pi_routing)
 
+    return pi_routing, S, capacities, demands_across_cuts, tight_cuts
+
+
+def relaxed_ring_loading(n, demands):
+    """
+
+    :param n:
+    :param demands:
+    :return:
+    """
+    pi_routing, S, capacities, _, _ = partial_integer_routing(n, demands)
     # Route remaining demands by splitting
-    # routing = route_crossing_demands(n, routing, S, demands)
-    return routing, S, capacities, demands_across_cuts, tight_cuts
+    routing = route_crossing_demands(n, partial_integer_routing, S, demands)
+
+    return routing
+
+
+def naive_relaxed_ring_loading(n, demands):
+    pass
 
 
 def route_crossing_demands(n, routing, S, demands):
+    """
+
+    :param n:
+    :param routing:
+    :param S:
+    :param demands:
+    :return:
+    """
     residual_capacities = []
 
+    # TODO: Check conjecture: There are only crossing demands in S (and maybe adapt if untrue)
     for (i, j) in S:
         c_max_front = np.min(residual_capacities[i:j])
         if demands[i, j] < c_max_front:
@@ -62,14 +93,12 @@ def find_parallel_demands(S):
 def route_parallel_demands_with_capacities(n, tight_cuts, capacities, demands):
     routing = SymmetricMatrix(n, initial_values=np.full((n, n), UNROUTED))
     # for each tight cut, route some parallel demands
-    # TODO: can be further optimized: when computing tight cuts, try to get as few as possible
-    # TODO: only iterate over distinct tight cuts
     for l in range(n):
         j = tight_cuts[l]
         i, j = min(l, j), max(l, j)
         # route demands in (i, j] through the front (we have i < j)
         for k in crange(i + 2, j + 1, n):
-            if routing[i+1, k] == UNROUTED:
+            if routing[i + 1, k] == UNROUTED:
                 capacities = decrease_capacities(n, capacities, demands[i + 1, k], i + 1, k, FORWARD)
             routing[i + 1, k] = FORWARD
 
@@ -142,10 +171,11 @@ def compute_capacities(n, demands_across_cuts):
     return c
 
 
-def find_tight_cuts(n, demands_across_cuts, c):
+def find_tight_cuts(n, demands_across_cuts, capacities):
     tight_cuts = np.zeros((n,), dtype=np.int)
     for i in range(n):
-        j = np.isclose(c + c[i], demands_across_cuts[i, :]).nonzero()[0]
+        # TODO: check if comparing the whole row is desired/necessary
+        j = np.isclose(capacities + capacities[i], demands_across_cuts[i, :]).nonzero()[0]
         # there might be multiple tight cuts, choose any
         j = j[0]
         tight_cuts[i] = j

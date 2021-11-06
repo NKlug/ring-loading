@@ -2,26 +2,26 @@ from symmetric_matrix import SymmetricMatrix
 import numpy as np
 
 
-def compute_demands_across_cuts(n, d):
+def compute_demands_across_cuts(n, demands):
     """
     Computes the demands across all cuts using the recursion
     :param n: ring size
-    :param d: demands
+    :param demands: demands
     :return:
     """
-    a = SymmetricMatrix(n, dtype=d.dtype)
-    D = SymmetricMatrix(n, dtype=d.dtype)
+    a = SymmetricMatrix(n, dtype=demands.dtype)
+    D = SymmetricMatrix(n, dtype=demands.dtype)
 
     # k = 1
     for i in range(n - 1):
-        a[i, i + 1] = d[i, i + 1]
-        D[i, i + 1] = np.sum(d[:i + 1, i + 1]) + np.sum(d[i + 1, i + 2:])
+        a[i, i + 1] = demands[i, i + 1]
+        D[i, i + 1] = np.sum(demands[:i + 1, i + 1]) + np.sum(demands[i + 1, i + 2:])
 
     # k = 2, ..., n
     for k in range(2, n):
         for i in range(0, n - k):
             j = i + k
-            a[i, j] = a[i, j - 1] + d[i, j]
+            a[i, j] = a[i, j - 1] + demands[i, j]
             D[i, j] = D[i, i + 1] + D[i + 1, j] - 2 * a[i + 1, j]
     return D
 

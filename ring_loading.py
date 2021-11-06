@@ -1,4 +1,4 @@
-from relaxed_ring_loading import relaxed_ring_loading
+from relaxed_ring_loading import partial_integer_routing
 
 
 def ring_loading(n, demands):
@@ -8,5 +8,5 @@ def ring_loading(n, demands):
     :param demands:
     :return:
     """
-    routing, S = relaxed_ring_loading(n, demands)
+    routing, S = partial_integer_routing(n, demands)
 
