@@ -1,9 +1,12 @@
 import numpy as np
 
+from check_cut_condition import check_cut_condition
 from constants import FORWARD, UNROUTED, BACKWARD
+from crossing_demands import all_demands_crossing
 from demands_across_cuts import compute_demands_across_cuts
 from residual_capacities import naive_compute_residual_capacities
 from symmetric_matrix import SymmetricMatrix
+from tight_cuts import find_tight_cuts, find_all_tight_cuts
 from utils import crange
 
 
@@ -61,7 +64,7 @@ def route_crossing_demands(n, routing, S, demands, residual_capacities):
     for (i, j) in S:
         i, j = min(i, j), max(i, j)
         c_min_front = np.min(residual_capacities[i:j])
-        if demands[i, j] < c_min_front:
+        if demands[i, j] <= c_min_front:
             routing[i, j] = FORWARD
             residual_capacities[i:j] -= demands[i, j]
         else:
@@ -79,15 +82,6 @@ def find_unrouted_demands(n, routing):
             if routing[i, j] == UNROUTED:
                 S.append((i, j))
     return S
-
-
-def find_parallel_demands(S):
-    parallel_demands = [[]] * len(S)
-    for index, (i, j) in enumerate(S):
-        for (k, l) in S:
-            if (i != k or j != l) and demands_are_parallel((i, j), (k, l)):
-                parallel_demands[index].append((k, l))
-    return parallel_demands
 
 
 def route_parallel_demands_with_capacities(n, tight_cuts, capacities, demands):
@@ -170,23 +164,5 @@ def compute_capacities(n, demands_across_cuts):
         c[i] = np.maximum(max_tight_capacity, max_m_capacity)
     return c
 
-
-def find_tight_cuts(n, demands_across_cuts, capacities):
-    tight_cuts = np.zeros((n,), dtype=np.int)
-    for i in range(n):
-        # TODO: check if comparing the whole row is desired/necessary
-        j = np.isclose(capacities + capacities[i], demands_across_cuts[i, :]).nonzero()[0]
-        # there might be multiple tight cuts, choose any
-        j = j[0]
-        tight_cuts[i] = j
-    return tight_cuts
-
-
 def cut_is_tight(ci, cj, dij):
     return np.isclose(ci + cj, dij)
-
-
-def demands_are_parallel(i1, i2):
-    i, j = min(i1), max(i1)
-    k, l = min(i2), max(i2)
-    return i < j <= k < l or k < l <= i < j or i <= k < l <= j or k <= i < j <= l
