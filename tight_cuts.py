@@ -20,10 +20,10 @@ def find_tight_cuts(n, demands_across_cuts, capacities):
 
 
 def find_all_tight_cuts(n, demands_across_cuts, capacities):
-    tight_cuts = [[]] * n
+    tight_cuts = []
     for i in range(n):
-        # TODO: check if comparing the whole row is desired/necessary
-        j = np.isclose(capacities + capacities[i], demands_across_cuts[i, :]).nonzero()[0]
-        # there might be multiple tight cuts, choose any
-        tight_cuts[i] = list(j)
+        cuts = np.isclose(capacities + capacities[i], demands_across_cuts[i, :]).nonzero()[0]
+        for j in cuts:
+            if i < j:
+                tight_cuts.append((i, j))
     return tight_cuts
