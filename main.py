@@ -4,9 +4,9 @@ from check_cut_condition import check_cut_condition
 from constants import UNROUTED
 from demands_across_cuts import compute_demands_across_cuts
 from generate_instance import generate_random_instance
-from relaxed_ring_loading import partial_integer_routing, relaxed_ring_loading
-from residual_capacities import naive_compute_residual_capacities, compute_residual_capacities, naive_compute_loads
-from symmetric_matrix import SymmetricMatrix
+from relaxed_ring_loading import partial_integer_routing
+from residual_capacities import compute_residual_capacities
+from tight_cuts import find_all_tight_cuts
 
 if __name__ == '__main__':
     n = 10
@@ -34,7 +34,14 @@ if __name__ == '__main__':
         f"Cut condition fulfilled for remaining demands: "
         f"{check_cut_condition(n, remaining_demands_across_cuts, res_capacities)}")
 
-    routing = relaxed_ring_loading(n, demands)
-    res_capacities = naive_compute_residual_capacities(n, routing, demands, capacities)
-    print(f"Total residual capacities: {res_capacities}")
+    tight_cuts_start = find_all_tight_cuts(n, demands_across_cuts, capacities)
+    print(f"All tight cuts at the start: {tight_cuts_start}")
+    print(f"Number of tight cuts: {len(tight_cuts_start)}")
+    tight_cuts_end = find_all_tight_cuts(n, remaining_demands_across_cuts, res_capacities)
+    print(f"All tight cuts at the end: {tight_cuts_end}")
+    print(f"Number of tight cuts: {len(tight_cuts_end)}")
+
+    # routing = relaxed_ring_loading(n, demands)
+    # res_capacities = naive_compute_residual_capacities(n, routing, demands, capacities)
+    # print(f"Total residual capacities: {res_capacities}")
     pass
