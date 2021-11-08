@@ -2,26 +2,25 @@ import numpy as np
 
 from check_cut_condition import check_cut_condition
 from constants import FORWARD, UNROUTED, BACKWARD
-from crossing_demands import all_demands_crossing
 from demands_across_cuts import compute_demands_across_cuts
-from residual_capacities import naive_compute_residual_capacities
+from residual_capacities import compute_residual_capacities
 from symmetric_matrix import SymmetricMatrix
-from tight_cuts import find_tight_cuts, find_all_tight_cuts
+from tight_cuts import find_tight_cuts
 from utils import crange
 
 
 def partial_integer_routing(n, demands):
     """
-
-    :param n:
-    :param demands:
+    A O(n^2) algorithm for finding a partial integer routing that leaves at most n/2 demands unrouted
+    :param n: instance size
+    :param demands: SymmetricMatrix containing demands
     :return:
     """
     demands_across_cuts = compute_demands_across_cuts(n, demands)
     capacities = compute_capacities(n, demands_across_cuts)
     tight_cuts = find_tight_cuts(n, demands_across_cuts, capacities)
 
-    # route all demands that are
+    # route some parallel demands
     pi_routing = route_parallel_demands(n, tight_cuts)
 
     # Find indices of unrouted demands
@@ -40,7 +39,7 @@ def relaxed_ring_loading(n, demands):
     # determine partial integer routing, set of unrouted demands S and capacities
     pi_routing, S, capacities, _, _ = partial_integer_routing(n, demands)
     # compute residual capacities
-    residual_capacities = naive_compute_residual_capacities(n, pi_routing, demands, capacities)
+    residual_capacities = compute_residual_capacities(n, pi_routing, demands, capacities)
     # Route remaining demands by splitting
     routing = route_crossing_demands(n, pi_routing, S, demands, residual_capacities)
 
@@ -60,8 +59,15 @@ def route_crossing_demands(n, routing, S, demands, residual_capacities):
     :param demands:
     :return:
     """
+    for i in range(len(S)):
+        pass
     # TODO: Check conjecture: There are only crossing demands in S (and maybe adapt if untrue)
     for (i, j) in S:
+        remaining_demands = demands.copy()
+        remaining_demands[np.where(routing != UNROUTED)] = 0
+        remaining_demands_across_cuts = compute_demands_across_cuts(n, remaining_demands)
+        print(f"Cut condition satisfied: {check_cut_condition(n, remaining_demands_across_cuts, residual_capacities)}")
+
         i, j = min(i, j), max(i, j)
         c_min_front = np.min(residual_capacities[i:j])
         if demands[i, j] <= c_min_front:
@@ -72,6 +78,7 @@ def route_crossing_demands(n, routing, S, demands, residual_capacities):
             residual_capacities[i:j] -= c_min_front
             residual_capacities[:i] -= demands[i, j] - c_min_front
             residual_capacities[j:] -= demands[i, j] - c_min_front
+        pass
     return routing
 
 
