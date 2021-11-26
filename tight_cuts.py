@@ -40,9 +40,12 @@ def find_new_tight_cuts(n, demands_across_cuts, capacities, previous_tight_cuts=
     """
     tight_cuts = []
     for i in range(n):
-        cuts = np.isclose(capacities + capacities[i], demands_across_cuts[i, :]).nonzero()[0]
+        # determine tight cuts
+        cuts = np.isclose(capacities[i+1:] + capacities[i], demands_across_cuts[i, i+1:]).nonzero()[0]
         for j in cuts:
-            if i < j and not previous_tight_cuts[i, j]:
+            if previous_tight_cuts is not None and not previous_tight_cuts[i, j]:
                 previous_tight_cuts[i, j] = True
+                tight_cuts.append((i, j))
+            elif previous_tight_cuts is None:
                 tight_cuts.append((i, j))
     return tight_cuts, previous_tight_cuts

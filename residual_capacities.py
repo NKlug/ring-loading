@@ -5,7 +5,7 @@ from constants import FORWARD, BACKWARD
 
 def compute_residual_capacities(n, routing, demands, old_capacities):
     """
-    Computes residual link capacities given a (partial) routing, previous capacities and demands
+    Computes residual link capacities given a (partial) routing, previous capacities and demands in O(n^2) time.
     :param n: instance size
     :param routing: (partial) routing
     :param demands: symmetric demand matrix
@@ -18,7 +18,7 @@ def compute_residual_capacities(n, routing, demands, old_capacities):
 
 def compute_link_loads(n, routing, demands):
     """
-    Computes link loads given a (partial) routing, previous capacities and demands
+    Computes link loads given a (partial) routing, previous capacities and demands in O(n^2) time.
     :param n: instance size
     :param routing: (partial) routing
     :param demands: symmetric demand matrix
