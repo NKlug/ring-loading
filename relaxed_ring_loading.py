@@ -3,7 +3,6 @@ import numpy as np
 from constants import FORWARD, UNROUTED, BACKWARD
 from demands_across_cuts import compute_demands_across_cuts, crosses_cut
 from residual_capacities import compute_residual_capacities
-from sanity_checks import check_cut_condition
 from symmetric_matrix import SymmetricMatrix
 from tight_cuts import find_tight_cuts, find_new_tight_cuts
 from utils import crange
@@ -107,8 +106,7 @@ def split_route_crossing_demands(n, routing, S, demands, capacities):
 
     for (i, j) in S:
         remaining_demands_across_cuts = compute_demands_across_cuts(n, remaining_demands)
-        residual_capacities = compute_residual_capacities(n, routing, demands, capacities)
-        print(f"Cut condition satisfied: {check_cut_condition(n, remaining_demands_across_cuts, residual_capacities)}")
+        # print(f"Cut condition satisfied: {check_cut_condition(n, remaining_demands_across_cuts, residual_capacities)}")
 
         i, j = min(i, j), max(i, j)
 
@@ -116,15 +114,14 @@ def split_route_crossing_demands(n, routing, S, demands, capacities):
         cut_slacks = pairwise_capacities_sum - remaining_demands_across_cuts
 
         m_front = np.min(cut_slacks[i:j - 1, i + 1:j])  # this takes O(n^2)
-        print(f'minimal front: {m_front}')
         if demands[i, j] <= m_front / 2:
             routing[i, j] = 1
-            # residual_capacities[i:j] -= demands[i, j]
+            residual_capacities[i:j] -= demands[i, j]
         else:
             routing[i, j] = (m_front / 2) / demands[i, j]
-            # residual_capacities[i:j] -= c_min_front
-            # residual_capacities[:i] -= demands[i, j] - c_min_front
-            # residual_capacities[j:] -= demands[i, j] - c_min_front
+            residual_capacities[i:j] -= m_front / 2
+            residual_capacities[:i] -= demands[i, j] - m_front / 2
+            residual_capacities[j:] -= demands[i, j] - m_front / 2
 
         # set remaining demand to zero
         remaining_demands[i, j] = 0

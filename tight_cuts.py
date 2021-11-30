@@ -12,7 +12,7 @@ def find_tight_cuts(n, demands_across_cuts, capacities):
     tight_cuts = np.zeros((n,), dtype=np.int)
     for i in range(n):
         # TODO: check if comparing the whole row is desired/necessary
-        j = np.isclose(capacities + capacities[i], demands_across_cuts[i, :]).nonzero()[0]
+        j = np.equal(capacities + capacities[i], demands_across_cuts[i, :]).nonzero()[0]
         # there might be multiple tight cuts, choose any
         j = j[0]
         tight_cuts[i] = j

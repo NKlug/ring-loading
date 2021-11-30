@@ -23,7 +23,6 @@ def compute_link_loads(n, routing, demands):
     :param n: instance size
     :param routing: (partial) routing
     :param demands: symmetric demand matrix
-    :param old_capacities: capacities prior to routing
     :return: residual capacities
     """
     forward_loads = np.zeros(n)
