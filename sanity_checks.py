@@ -37,4 +37,5 @@ def is_optimal_routing(n, demands, routing):
     max_load = np.max(link_loads)
     max_demand_across_cut = np.max(compute_demands_across_cuts(n, demands))
 
+    print(f'Difference to optimal: {max_load - max_demand_across_cut/2}')
     return np.isclose(max_load, max_demand_across_cut / 2)

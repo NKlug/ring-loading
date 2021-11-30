@@ -212,7 +212,7 @@ def route_parallel_demands(n, tight_cuts):
 
 
 def compute_capacities(n, demands_across_cuts):
-    c = np.zeros((n,), dtype=demands_across_cuts.dtype)
+    c = np.zeros((n,), dtype=np.float32)
     m = np.max(demands_across_cuts)
 
     for i in range(n):

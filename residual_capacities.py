@@ -16,6 +16,7 @@ def compute_residual_capacities(n, routing, demands, old_capacities):
     return old_capacities - link_loads
 
 
+# TODO: This might produce numerical errors. This has to be determined.
 def compute_link_loads(n, routing, demands):
     """
     Computes link loads given a (partial) routing, previous capacities and demands in O(n^2) time.
