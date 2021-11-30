@@ -48,6 +48,7 @@ def compute_link_loads(n, routing, demands):
 
     return forward_loads + backward_loads
 
+
 def naive_compute_residual_capacities(n, routing, demands, prior_capacities):
     """
     A O(n^3) algorithm for computing the residual capacities
