@@ -19,5 +19,9 @@ def generate_random_instance(n, max_demand, sparsity, integer=False, seed=None):
     np.fill_diagonal(a, 0)
     if integer:
         a = a.astype(np.int)
-    return SymmetricMatrix(n, initial_values=a)
+    sym_matrix = SymmetricMatrix(n, initial_values=a)
+    zero_indices_1 = np.random.choice(np.arange(n, dtype=int), int(sparsity/2 * n**2), replace=True)
+    zero_indices_2 = np.random.choice(np.arange(n, dtype=int), int(sparsity/2 * n**2), replace=True)
+    sym_matrix[zero_indices_1, zero_indices_2] = 0
+    return sym_matrix
 
