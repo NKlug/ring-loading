@@ -2,7 +2,7 @@ import numpy as np
 
 from constants import FORWARD, UNROUTED, BACKWARD
 from demands_across_cuts import compute_demands_across_cuts, crosses_cut
-from residual_capacities import compute_residual_capacities
+from residual_capacities import compute_residual_capacities, compute_capacities
 from symmetric_matrix import SymmetricMatrix
 from tight_cuts import find_tight_cuts, find_new_tight_cuts
 from utils import crange
@@ -138,29 +138,6 @@ def find_unrouted_demands(n, routing):
     return S
 
 
-def route_parallel_demands_with_capacities(n, tight_cuts, capacities, demands):
-    routing = SymmetricMatrix(n, initial_values=np.full((n, n), UNROUTED))
-    # for each tight cut, route some parallel demands
-    for l in range(n):
-        j = tight_cuts[l]
-        i, j = min(l, j), max(l, j)
-        # route demands in (i, j] through the front (we have i < j)
-        for k in crange(i + 2, j + 1, n):
-            if routing[i + 1, k] == UNROUTED:
-                capacities = decrease_capacities(n, capacities, demands[i + 1, k], i + 1, k, FORWARD)
-            routing[i + 1, k] = FORWARD
-
-        # route demands in (j, i] such that they miss the links [i, j)
-        for k in crange((j + 2) % n, i + 1, n):
-            start = (j + 1) % n
-            route = determine_route(start, k)
-            if routing[start, k] == UNROUTED:
-                capacities = decrease_capacities(n, capacities, demands[start, k], start, k, route)
-            routing[start, k] = route
-
-    return routing, capacities
-
-
 def determine_route(j, k):
     """
     Choose routing according to the relation of j and k. If j < k, route forward, if k < j, route backward.
@@ -175,20 +152,14 @@ def determine_route(j, k):
         return BACKWARD
 
 
-def decrease_capacities(n, capacities, demand, i, j, route):
-    if route == FORWARD:
-        i, j = min(i, j), max(i, j)
-    elif route == BACKWARD:
-        i, j = max(i, j), min(i, j)
-    else:
-        raise Exception("Bad route!")
-    for k in crange(i, j, n):
-        capacities[k] -= demand
-        assert capacities[k] >= 0
-    return capacities
-
-
-def route_parallel_demands(n, tight_cuts):
+def route_adjacent_parallel_demands(n, tight_cuts):
+    """
+    Old way of routing demands that are parallel to the tight cuts in O(n^2).
+    However, it could not be proven that this function is correct.
+    :param n:
+    :param tight_cuts:
+    :return:
+    """
     routing = SymmetricMatrix(n, initial_values=UNROUTED * np.ones((n, n)))
     # for each tight cut, route some parallel demands
     # TODO: can be further optimized: when computing tight cuts, try to get as few as possible
@@ -208,15 +179,43 @@ def route_parallel_demands(n, tight_cuts):
     return routing
 
 
-def compute_capacities(n, demands_across_cuts):
-    c = np.zeros((n,), dtype=np.float32)
-    m = np.max(demands_across_cuts)
+def route_parallel_demands(n, tight_cuts):
+    """
 
-    for i in range(n):
-        max_tight_capacity = np.max(demands_across_cuts[:i, i] - c[:i], initial=0)
-        max_m_capacity = np.max(demands_across_cuts[i, i + 1:] - m / 2, initial=0)
-        c[i] = np.maximum(max_tight_capacity, max_m_capacity)
-    return c
+    :param n:
+    :param tight_cuts:
+    :return:
+    """
+    routing = SymmetricMatrix(n, initial_values=UNROUTED * np.ones((n, n)))
+
+    next_unrouted = np.roll(np.arange(0, n), -1)  # = [2, 3, 4, ..., n, 1]
+    for g in range(n):
+        h = tight_cuts[g]
+        for i in range(n):
+            j = next_unrouted[i]
+            while i != j and demand_parallel_to_cut((i, j), (g, h)):
+                routing[i, j] = route_parallel_to_cut((i, j), (g, h))
+                j = (j + 1) % n
+            next_unrouted[i] = j
+
+    return routing
+
+
+def route_parallel_to_cut(demand, cut):
+    """
+    Determines the route of a demand given a cut it is parallel to.
+    :param demand:
+    :param cut:
+    :return:
+    """
+    i, j = min(demand), max(demand)
+    g, h = min(cut), max(cut)
+    if j <= g or h < i or g < i < j <= h:
+        return FORWARD
+    elif i <= g and h < j:
+        return BACKWARD
+    else:
+        raise Exception('Demand not parallel to cut!')
 
 
 def cut_is_tight(ci, cj, dij):
