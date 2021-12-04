@@ -1,5 +1,6 @@
-from symmetric_matrix import SymmetricMatrix
 import numpy as np
+
+from symmetric_matrix import SymmetricMatrix
 
 
 def compute_demands_across_cuts(n, demands):
@@ -45,11 +46,11 @@ def naive_compute_demands_across_cuts(n, d):
 
 def crosses_cut(demand, cut):
     """
-
+    Determines whether a demand crosses a cut.
     :param demand:
     :param cut:
     :return:
     """
-    k, l = demand
-    i, j = cut
-    return (k <= i < l <= j) or (i < k <= j < l)
+    i, j = min(demand), max(demand)
+    g, h = min(cut), max(cut)
+    return (i <= g < j <= h) or (g < i <= h < j)
