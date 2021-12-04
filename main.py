@@ -6,7 +6,7 @@ from residual_capacities import compute_link_loads
 from sanity_checks import is_complete_routing, is_optimal_routing
 
 if __name__ == '__main__':
-    n = 150
+    n = 10
     seed = np.random.randint(0, 100000)
     # seed = 6017  # n = 10
     # seed = 5264  # n = 100
