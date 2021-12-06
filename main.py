@@ -30,7 +30,7 @@ if __name__ == '__main__':
     #     f"{check_cut_condition(n, remaining_demands_across_cuts, res_capacities)}")
 
     routing = relaxed_ring_loading(n, demands)
-    # print(routing)
+    print(routing)
     print(f'Link loads: {compute_link_loads(n, routing, demands)}')
     print(f'Complete Routing: {is_complete_routing(routing)}')
     print(f'Optimal Routing: {is_optimal_routing(n, demands, routing)}')

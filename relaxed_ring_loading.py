@@ -2,8 +2,10 @@ import numpy as np
 
 from constants import FORWARD, UNROUTED, BACKWARD
 from contract_instance import contract_instance
-from demands_across_cuts import compute_demands_across_cuts, crosses_cut
+from crossing_demands import all_demands_crossing
+from demands_across_cuts import compute_demands_across_cuts, demand_crosses_cut, demands_across_cuts_edge_fixed
 from residual_capacities import compute_residual_capacities, compute_capacities
+from sanity_checks import check_cut_condition
 from symmetric_matrix import SymmetricMatrix
 from tight_cuts import find_tight_cuts, find_new_tight_cuts
 from utils import crange
@@ -39,11 +41,8 @@ def relaxed_ring_loading(n, demands):
     # determine partial integer routing, set of unrouted demands S and capacities
     pi_routing, S, capacities, _, _ = partial_integer_routing(n, demands)
 
-    ci_routing = pi_routing
-    # ci_routing, S = complete_integer_routing(n, pi_routing, S, demands, capacities)
-
     # Route remaining demands by splitting
-    routing = split_route_crossing_demands_2(n, ci_routing, S, demands, capacities)
+    routing = split_route_crossing_demands_2(n, pi_routing, S, demands, capacities)
 
     return routing
 
@@ -107,7 +106,6 @@ def split_route_crossing_demands(n, routing, S, demands, capacities):
 
     for (i, j) in S:
         remaining_demands_across_cuts = compute_demands_across_cuts(n, remaining_demands)
-        # print(f"Cut condition satisfied: {check_cut_condition(n, remaining_demands_across_cuts, residual_capacities)}")
 
         i, j = min(i, j), max(i, j)
 
@@ -140,10 +138,81 @@ def split_route_crossing_demands_2(n, routing, S, demands, capacities):
     :param capacities:
     :return:
     """
+    assert all_demands_crossing(S)  # check that all demands in S are mutually crossing
     # we know that all unrouted demands are crossing, i.e. |S| <= n/2
-    m, T, demands_2, capacities_2 = contract_instance(n, routing, S, demands, capacities)
-    pass
+    m, T, contracted_demands, contracted_capacities = contract_instance(n, routing, S, demands, capacities)
+
+    # compute demands across cuts and cut slacks in contracted instance in O(n^2) time
+    demands_across_cuts = compute_demands_across_cuts(m, contracted_demands)
+    pairwise_capacities_sum = contracted_capacities[:, None] + contracted_capacities[None, :]
+    cut_slacks = pairwise_capacities_sum - demands_across_cuts
+    print(f'Contracted instance feasible: {check_cut_condition(m, demands_across_cuts, contracted_capacities)}')
+
+    # Intuition: min_slacks[i] corresponds to the minimal slack of the cut originating in edge i up to m/2 + i -1
+    min_slacks = np.full(m, np.inf)
+    # determine initial minimal slacks in O(n^2)
+    for i in range(m // 2 - 1):
+        min_slacks[i] = np.min(cut_slacks[i, i + 1:m // 2])
+
+    # sorted(S)[i] corresponds bijectively to sorted(T)[i]:
+    S = sorted(S)
+
+    for k in range(len(T)):
+        i, j = T.pop(0)
+
+        dac = compute_demands_across_cuts(m, contracted_demands)
+        print(
+            f'Cut condition fulfilled before iteration {k}: {check_cut_condition(m, dac, contracted_capacities)}')
+
+        # skip in first step - we already calculated the appropriate minimal slack during initialization
+        if k > 0:
+            # compute demands across cuts where one edge is {j, j+1}, i.e. of all demands of the form
+            # {x, j}, i <= x < j, of which there are n / 2 - 1
+            demands_across_cuts_j = demands_across_cuts_edge_fixed(m, T, contracted_demands)  # O(n)
+
+            naive_demands_across_cuts_j = compute_demands_across_cuts(m, contracted_demands)[i:j - 1, j - 1]
+            print(
+                f'demand_across_cuts_j equal to naive demands_across_cuts '
+                f'for cut {i, j}: {np.alltrue(naive_demands_across_cuts_j == demands_across_cuts_j[:j - 1 - i])}')
+            # assert np.alltrue(naive_demands_across_cuts_j == demands_across_cuts_j[:j - 1 - i])
+            slacks_j = contracted_capacities[j-1] + contracted_capacities[i:j - 1] - demands_across_cuts_j  # O(n)
+
+            # compute new minimal forward slacks
+            for l in range(i, j - 1):
+                min_slacks[l] = min(min_slacks[l], slacks_j[l - i])
+
+        # for testing:
+        pairwise_capacities_sum = contracted_capacities[:, None] + contracted_capacities[None, :]
+        cut_slacks = pairwise_capacities_sum - compute_demands_across_cuts(m, contracted_demands)
+        min_slacks_naive = [np.min(cut_slacks[z, j - 1]) for z in range(i, j - 1)]
+
+        # route demand (i, j)
+        min_slack = np.min(min_slacks[i:j - 1])  # O(n)
+        # assert min_slack >= 0
+
+        # for testing
+        min_slack_naive = np.min(min_slacks_naive)
+
+        assert min_slack == min_slack_naive
+        print(f'Found min cut in the front with slack {min_slack}')
+
+        M = min(contracted_demands[i, j], min_slack / 2)
+        assert M >= 0
+        print(f'Routing {M / contracted_demands[i, j]} through '
+              f'the front for cut {(i, j)} with demand {contracted_demands[i, j]}')
+        routing[S[k]] = M / contracted_demands[i, j]
+        contracted_capacities[i:j] -= M
+        contracted_capacities[:i] -= contracted_demands[i, j] - M
+        contracted_capacities[j:] -= contracted_demands[i, j] - M
+
+        # set routed demand to zero in remaining contracted demands
+        contracted_demands[i, j] = 0
+
+        # the slacks of all cuts in [i+1, j) are decreased by 2 * M (-M for each edge in the cut)
+        min_slacks[i:j - 1] -= 2 * M
+
     return routing
+
 
 def find_unrouted_demands(n, routing):
     S = []
@@ -240,4 +309,4 @@ def cut_is_tight(ci, cj, dij):
 
 
 def demand_parallel_to_cut(demand, cut):
-    return not crosses_cut(demand, cut)
+    return not demand_crosses_cut(demand, cut)
