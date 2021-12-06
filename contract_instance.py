@@ -29,7 +29,7 @@ def contract_instance(n, routing, S, demands, capacities):
     # k = [1, 2, ..., m-2]
     for k in range(2 * m - 1):
         i = flat_S[k]
-        j = flat_S[(k + 1) % m]
+        j = flat_S[(k + 1) % (2*m)]
         new_capacities[k] = np.min(residual_capacities[i:j], initial=np.inf)
 
     # k = m - 1

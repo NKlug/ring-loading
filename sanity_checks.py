@@ -22,7 +22,7 @@ def is_complete_routing(routing):
     :return:
     """
     routing = np.fill_diagonal(routing.copy(), FORWARD)
-    return np.alltrue(routing != UNROUTED)
+    return np.alltrue(routing != UNROUTED) and np.alltrue(routing >= 0)
 
 
 def is_optimal_routing(n, demands, routing):
