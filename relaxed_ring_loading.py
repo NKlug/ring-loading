@@ -1,6 +1,7 @@
 import numpy as np
 
 from constants import FORWARD, UNROUTED, BACKWARD
+from contract_instance import contract_instance
 from demands_across_cuts import compute_demands_across_cuts, crosses_cut
 from residual_capacities import compute_residual_capacities, compute_capacities
 from symmetric_matrix import SymmetricMatrix
@@ -42,7 +43,7 @@ def relaxed_ring_loading(n, demands):
     # ci_routing, S = complete_integer_routing(n, pi_routing, S, demands, capacities)
 
     # Route remaining demands by splitting
-    routing = split_route_crossing_demands(n, ci_routing, S, demands, capacities)
+    routing = split_route_crossing_demands_2(n, ci_routing, S, demands, capacities)
 
     return routing
 
@@ -129,6 +130,21 @@ def split_route_crossing_demands(n, routing, S, demands, capacities):
     return routing
 
 
+def split_route_crossing_demands_2(n, routing, S, demands, capacities):
+    """
+
+    :param n:
+    :param routing:
+    :param S:
+    :param demands:
+    :param capacities:
+    :return:
+    """
+    # we know that all unrouted demands are crossing, i.e. |S| <= n/2
+    m, T, demands_2, capacities_2 = contract_instance(n, routing, S, demands, capacities)
+    pass
+    return routing
+
 def find_unrouted_demands(n, routing):
     S = []
     for i in range(0, n - 1):
@@ -181,7 +197,7 @@ def route_adjacent_parallel_demands(n, tight_cuts):
 
 def route_parallel_demands(n, tight_cuts):
     """
-
+    Routes all demands that are parallel to the given tight cuts in O(n^2) time.
     :param n:
     :param tight_cuts:
     :return:
@@ -204,6 +220,7 @@ def route_parallel_demands(n, tight_cuts):
 def route_parallel_to_cut(demand, cut):
     """
     Determines the route of a demand given a cut it is parallel to.
+    In O(1) time.
     :param demand:
     :param cut:
     :return:
