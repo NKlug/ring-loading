@@ -24,30 +24,19 @@ def contract_instance(n, routing, S, demands, capacities):
     T = [(i, i + m) for i in range(m)]
 
     new_capacities = np.zeros(2 * m, dtype=np.float32)
-    ordered_S = sorted(S)
+    # because all demands are mutually crossing, all elements in S[:, 0] are <= than all in S[:, 1]
+    flat_S = sorted([i for demand in S for i in demand])
     # k = [1, 2, ..., m-2]
-    for k in range(m - 1):
-        i, j = ordered_S[k]
-        u, v = ordered_S[(k + 1) % m]
-        min_capacity_front = np.min(residual_capacities[i:u], initial=np.inf)
-        min_capacity_back = np.min(residual_capacities[j:v], initial=np.inf)
-        # take care of special cases when u < i  or j < v (then the intervals above are empty)
-        if u < i:
-            min_capacity_front = min(np.min(residual_capacities[i:n], initial=np.inf),
-                                     np.min(residual_capacities[0:u], initial=np.inf))
-        if j < v:
-            min_capacity_back = min(np.min(residual_capacities[j:n], initial=np.inf),
-                                    np.min(residual_capacities[0:v], initial=np.inf))
-        new_capacities[k] = min_capacity_front
-        new_capacities[k + m] = min_capacity_back
+    for k in range(2 * m - 1):
+        i = flat_S[k]
+        j = flat_S[(k + 1) % m]
+        new_capacities[k] = np.min(residual_capacities[i:j], initial=np.inf)
 
     # k = m - 1
-    i, j = ordered_S[m - 1]
-    v, u = ordered_S[0]  # u and v are purposely switched here!
-    new_capacities[m - 1] = min(np.min(residual_capacities[i:n], initial=np.inf),
-                                np.min(residual_capacities[0:u], initial=np.inf))
-    new_capacities[2 * m - 1] = min(np.min(residual_capacities[j:n], initial=np.inf),
-                                    np.min(residual_capacities[0:v], initial=np.inf))
+    i = flat_S[-1]
+    j = flat_S[0]
+    new_capacities[-1] = min(np.min(residual_capacities[i:n], initial=np.inf),
+                             np.min(residual_capacities[0:j], initial=np.inf))
 
     new_demands = SymmetricMatrix(2 * m, initial_values=np.zeros((2 * m, 2 * m)))
     for k in range(m):
