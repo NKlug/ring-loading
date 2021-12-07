@@ -6,13 +6,12 @@ from residual_capacities import compute_link_loads
 from sanity_checks import is_complete_routing, is_optimal_routing
 
 if __name__ == '__main__':
-    n = 100
+    n = 1000
     seed = np.random.randint(0, 100000)
-    # seed = 6017  # n = 10
-    # seed = 5264  # n = 100
-    # seed = 89608  # n = 100
+    # seed = 43085  # n = 500
+    # seed = 89786  # n = 250
     print(f'Seed: {seed}')
-    demands = generate_random_instance(n=n, max_demand=100, sparsity=0, integer=True, seed=seed)
+    demands = generate_random_instance(n=n, max_demand=100, sparsity=0.3, integer=True, seed=seed)
 
     pi_routing, S, capacities, demands_across_cuts, tight_cuts = partial_integer_routing(n, demands)
     print(f"Unrouted demands: {S}")
@@ -30,7 +29,7 @@ if __name__ == '__main__':
     #     f"{check_cut_condition(n, remaining_demands_across_cuts, res_capacities)}")
 
     routing = relaxed_ring_loading(n, demands)
-    print(routing)
+    # print(routing)
     print(f'Link loads: {compute_link_loads(n, routing, demands)}')
     print(f'Complete Routing: {is_complete_routing(routing)}')
     print(f'Optimal Routing: {is_optimal_routing(n, demands, routing)}')
