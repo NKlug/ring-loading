@@ -1,3 +1,5 @@
+import collections
+
 import numpy as np
 
 from constants import FORWARD, UNROUTED, BACKWARD
@@ -74,7 +76,7 @@ def complete_integer_routing(n, routing, S, demands, capacities):
     tight_cuts = SymmetricMatrix(n, initial_values=np.zeros((n, n), dtype=bool))
     new_tight_cuts, tight_cuts = find_new_tight_cuts(n, remaining_demands_across_cuts, residual_capacities, tight_cuts)
 
-    # O(n^3)
+    # O(|S|*n^2) = O(n^3)
     for k in range(len(S)):
         for (g, h) in new_tight_cuts:
             for (i, j) in S:
@@ -99,7 +101,8 @@ def complete_integer_routing(n, routing, S, demands, capacities):
 
 def naive_split_route_crossing_demands(n, routing, S, demands, capacities):
     """
-
+    A general procedure to split-route unrouted demands.
+    Runs in O(|S|*n^2) time.
     :param capacities:
     :param n:
     :param routing:
@@ -165,9 +168,12 @@ def split_route_crossing_demands(n, routing, S, demands, capacities):
     # sorted(S)[i] corresponds bijectively to sorted(T)[i]:
     S = sorted(S)
 
+    # turn T into a deque for fast pop().
+    T = collections.deque(T)
+
     # O(n^2)
     for k in range(len(T)):
-        i, j = T.pop(0)
+        i, j = T.popleft()
 
         # skip in first step - we already calculated the appropriate minimal slacks during initialization
         if k > 0:
