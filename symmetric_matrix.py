@@ -1,6 +1,7 @@
 import numpy as np
 
 
+# TODO: Make this datatype safer. Currently slices of SymmetricMatrix are also of type SymmetricMatrix.
 class SymmetricMatrix(np.ndarray):
     def __new__(cls, n, initial_values=None, dtype=np.float32, *args, **kwargs):
         if initial_values is None:

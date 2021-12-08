@@ -7,7 +7,6 @@ from contract_instance import contract_instance
 from crossing_demands import all_demands_crossing
 from demands_across_cuts import compute_demands_across_cuts, demand_crosses_cut, demands_across_cuts_edge_fixed
 from residual_capacities import compute_residual_capacities, compute_capacities
-from sanity_checks import check_cut_condition
 from symmetric_matrix import SymmetricMatrix
 from tight_cuts import find_tight_cuts, find_new_tight_cuts
 from utils import crange
@@ -157,9 +156,8 @@ def split_route_crossing_demands(n, routing, S, demands, capacities):
     demands_across_cuts = compute_demands_across_cuts(m, contracted_demands)
     pairwise_capacities_sum = contracted_capacities[:, None] + contracted_capacities[None, :]
     cut_slacks = pairwise_capacities_sum - demands_across_cuts
-    print(f'Contracted instance feasible: {check_cut_condition(m, demands_across_cuts, contracted_capacities)}')
 
-    # Intuition: min_slacks[i] corresponds to the minimal slack of the cut originating in edge i up to m/2 + i -1
+    # Intuition: min_slacks[i] corresponds to the minimal slack of the cuts originating in edge i up to m/2 + i -1
     min_slacks = np.full(m, np.inf)
     # determine initial minimal slacks in O(n^2)
     for i in range(m // 2 - 1):
@@ -168,7 +166,7 @@ def split_route_crossing_demands(n, routing, S, demands, capacities):
     # sorted(S)[i] corresponds bijectively to sorted(T)[i]:
     S = sorted(S)
 
-    # turn T into a deque for fast pop().
+    # turn T into a deque for fast popleft().
     T = collections.deque(T)
 
     # O(n^2)
@@ -177,8 +175,8 @@ def split_route_crossing_demands(n, routing, S, demands, capacities):
 
         # skip in first step - we already calculated the appropriate minimal slacks during initialization
         if k > 0:
-            # compute demands across cuts where one edge is {j, j+1}, i.e. of all demands of the form
-            # {x, j}, i <= x < j, of which there are n / 2 - 1
+            # compute demands across cuts where one edge in the cut is {j, j+1}, i.e. the dacs of all demands of
+            # the form {x, j}, i <= x < j, of which there are n / 2 - 1
             demands_across_cuts_j = demands_across_cuts_edge_fixed(m, T, contracted_demands)  # O(n)
 
             slacks_j = contracted_capacities[j-1] + contracted_capacities[i:j - 1] - demands_across_cuts_j  # O(n)
