@@ -3,17 +3,6 @@ import numpy as np
 from constants import FORWARD, BACKWARD
 
 
-def compute_capacities(n, demands_across_cuts):
-    c = np.zeros((n,), dtype=np.float32)
-    m = np.max(demands_across_cuts)
-
-    for i in range(n):
-        max_tight_capacity = np.max(demands_across_cuts[:i, i] - c[:i], initial=0)
-        max_m_capacity = np.max(demands_across_cuts[i, i + 1:] - m / 2, initial=0)
-        c[i] = np.maximum(max_tight_capacity, max_m_capacity)
-    return c
-
-
 def compute_residual_capacities(n, routing, demands, old_capacities):
     """
     Computes residual link capacities given a (partial) routing, previous capacities and demands in O(n^2) time.

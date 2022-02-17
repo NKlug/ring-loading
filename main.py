@@ -1,7 +1,7 @@
 import numpy as np
 
 from generate_instance import generate_random_instance
-from relaxed_ring_loading import relaxed_ring_loading, partial_integer_routing
+from proposed.ring_loading import partial_integer_routing, relaxed_ring_loading
 from residual_capacities import compute_link_loads
 from sanity_checks import is_complete_routing, is_optimal_routing
 

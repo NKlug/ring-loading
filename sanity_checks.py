@@ -1,7 +1,7 @@
 import numpy as np
 
 from constants import FORWARD, UNROUTED
-from demands_across_cuts import compute_demands_across_cuts
+from proposed.demands_across_cuts import compute_demands_across_cuts
 from residual_capacities import compute_link_loads
 
 

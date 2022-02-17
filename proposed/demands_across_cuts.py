@@ -27,23 +27,6 @@ def compute_demands_across_cuts(n, demands):
     return D
 
 
-def naive_compute_demands_across_cuts(n, d):
-    D = SymmetricMatrix(n, dtype=d.dtype)
-
-    # loop over cuts
-    for i in range(0, n - 1):
-        for j in range(i + 1, n):
-            x = 0
-            # loop over demands
-            for k in range(0, n - 1):
-                for l in range(k + 1, n):
-                    if demand_crosses_cut((k, l), (i, j)):
-                        x += d[k, l]
-            D[i, j] = x
-
-    return D
-
-
 def demands_across_cuts_edge_fixed(n, S, demands):
     """
     Computes the demand across cuts for all cuts of the form {k, edge} with edge - n/2 <= k < edge.
@@ -70,18 +53,6 @@ def demands_across_cuts_edge_fixed(n, S, demands):
 
     # assumes S to be sorted
     for k in range(1, len(S)):
-        demands_across_cuts[k] = demands_across_cuts[k-1] - demands[S[k-1]]
+        demands_across_cuts[k] = demands_across_cuts[k - 1] - demands[S[k - 1]]
 
     return demands_across_cuts
-
-
-def demand_crosses_cut(demand, cut):
-    """
-    Determines whether a demand crosses a cut.
-    :param demand:
-    :param cut:
-    :return:
-    """
-    i, j = min(demand), max(demand)
-    g, h = min(cut), max(cut)
-    return (i <= g < j <= h) or (g < i <= h < j)
