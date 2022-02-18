@@ -13,5 +13,7 @@ using the `ring_loading(n, demands)` function. Note that here, `demands` is a li
 
 
 ## References
-[1] Nikolas Klug...
+[1] Nikolas Klug. An Algorithm for Minimal Solutions to the Ring Loading
+Problem. Term Paper, 2022.
+
 [2] Schrijver, A., Seymour, P. and Winkler, P., 1999. _The Ring Loading Problem_. SIAM review, 41(4), pp.777-791.
