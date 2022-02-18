@@ -1,15 +1,16 @@
 import numpy as np
 
+import proposed.ring_loading as proposed
 import schrijver.ring_loading as schrijver
 from generate_instance import generate_random_instance
 from proposed.residual_capacities import compute_link_loads
 from sanity_checks import is_complete_routing, is_optimal_routing
 
 if __name__ == '__main__':
-    n = 10
+    n = 100
     seed = np.random.randint(0, 100000)
     # seed = 43085  # n = 500
-    # seed = 89786  # n = 250
+    seed = 89786  # n = 250
     print(f'Seed: {seed}')
     demands = generate_random_instance(n=n, max_demand=100, sparsity=0.1, integer=True, seed=seed)
 
@@ -34,11 +35,14 @@ if __name__ == '__main__':
             if demands[i, j] != 0:
                 demands_list.append((i, j, demands[i, j]))
 
+    print('Schrijver:')
     routing = schrijver.ring_loading(n, demands_list)
-    # routing = proposed.ring_loading(n, demands)
-    # print(routing)
     print(f'Link loads: {compute_link_loads(n, routing, demands)}')
     print(f'Complete Routing: {is_complete_routing(routing)}')
     print(f'Optimal Routing: {is_optimal_routing(n, demands, routing)}')
 
-    pass
+    print('Proposed:')
+    routing = proposed.ring_loading(n, demands)
+    print(f'Link loads: {compute_link_loads(n, routing, demands)}')
+    print(f'Complete Routing: {is_complete_routing(routing)}')
+    print(f'Optimal Routing: {is_optimal_routing(n, demands, routing)}')

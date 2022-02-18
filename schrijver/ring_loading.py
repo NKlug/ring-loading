@@ -2,10 +2,10 @@ import numpy as np
 
 from capacities import compute_capacities
 from constants import FORWARD
-from cut_utils import find_tight_cuts, determine_route_parallel_to_cut, demand_parallel_to_cut
-from demand_utils import demands_are_parallel
 from schrijver.demands_across_cuts import compute_demands_across_cuts
 from symmetric_matrix import SymmetricMatrix
+from utils.cut_utils import find_tight_cuts, determine_route_parallel_to_cut, demand_parallel_to_cut
+from utils.demand_utils import demands_are_parallel
 
 
 def ring_loading(n, demands):
@@ -20,6 +20,9 @@ def ring_loading(n, demands):
     capacities = compute_capacities(n, demands_across_cuts)
 
     pi_routing, capacities, demands = partial_integer_routing(n, demands, demands_across_cuts, capacities)
+
+    demands_across_cuts = compute_demands_across_cuts(n, demands)
+
     routing = split_route_crossing_demands(n, pi_routing, demands, capacities)
 
     return routing
@@ -85,10 +88,14 @@ def find_edge_in_between(demand1, demand2):
     """
     i, j = demand1
     k, l = demand2
-    if j < k:
+    if j == k:
+        return l
+    elif j < k:
         return j
-    else:
+    elif i < k:
         return i
+    elif i == k:
+        return j
 
 
 def split_route_crossing_demands(n, routing, demands, capacities):
@@ -101,8 +108,9 @@ def split_route_crossing_demands(n, routing, demands, capacities):
     :param demands: SymmetricMatrix containing demands
     :return:
     """
-    for i, j, d_ij in demands:
+    for _ in range(len(demands)):
         demands_across_cuts = compute_demands_across_cuts(n, demands)
+        i, j, d_ij = demands.pop()
 
         i, j = min(i, j), max(i, j)
 

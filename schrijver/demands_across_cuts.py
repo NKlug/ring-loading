@@ -1,5 +1,5 @@
-from cut_utils import demand_crosses_cut
 from symmetric_matrix import SymmetricMatrix
+from utils.cut_utils import demand_crosses_cut
 
 
 def compute_demands_across_cuts(n, demands):
@@ -9,7 +9,7 @@ def compute_demands_across_cuts(n, demands):
     :param demands:
     :return:
     """
-    D = SymmetricMatrix(n, dtype=demands.dtype)
+    D = SymmetricMatrix(n, dtype=type(demands[0][2]))
 
     # loop over cuts
     for g in range(0, n - 1):
