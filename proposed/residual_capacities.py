@@ -6,11 +6,11 @@ from constants import FORWARD, BACKWARD
 def compute_residual_capacities(n, routing, demands, old_capacities):
     """
     Computes residual link capacities given a (partial) routing, previous capacities and demands in O(n^2) time.
-    :param n: instance size
-    :param routing: (partial) routing
-    :param demands: symmetric demand matrix
-    :param old_capacities: capacities prior to routing
-    :return: residual capacities
+    :param n: ring size
+    :param routing: SymmetricMatrix containing the (partial) routing
+    :param demands: SymmetricMatrix of demands
+    :param old_capacities: np.array of capacities prior to routing
+    :return: np.array of residual capacities
     """
     link_loads = compute_link_loads(n, routing, demands)
     return old_capacities - link_loads
@@ -19,10 +19,10 @@ def compute_residual_capacities(n, routing, demands, old_capacities):
 def compute_link_loads(n, routing, demands):
     """
     Computes link loads given a (partial) routing, previous capacities and demands in O(n^2) time.
-    :param n: instance size
-    :param routing: (partial) routing
-    :param demands: symmetric demand matrix
-    :return: residual capacities
+    :param n: ring size
+    :param routing: SymmetricMatrix containing the (partial) routing
+    :param demands: SymmetricMatrix of demands
+    :return: np.array of link loads
     """
     forward_loads = np.zeros(n)
     backward_loads = np.zeros(n)
@@ -51,10 +51,10 @@ def compute_link_loads(n, routing, demands):
 def directional_weighted_sum(demand_array, routing_array, direction):
     """
     Computes the weighted sum of the given demands and routing in the given direction.
-    :param demand_array:
-    :param routing_array:
-    :param direction: forward or backward
-    :return:
+    :param demand_array: np.array containing demands
+    :param routing_array: np.array containing routing of demands
+    :param direction: FORWARD or BACKWARD
+    :return: link load in the given direction
     """
     condition = np.logical_and(0 <= routing_array, routing_array <= 1)
     if direction == FORWARD:

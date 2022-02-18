@@ -4,10 +4,10 @@ from utils.cut_utils import demand_crosses_cut
 
 def compute_demands_across_cuts(n, demands):
     """
-
-    :param n:
-    :param demands:
-    :return:
+    Computes all demands across cuts in the naive way. Takes O(k n^2) time.
+    :param n: ring size
+    :param demands: list of non-zero demands
+    :return: SymmetricMatrix containing all demands across cuts
     """
     D = SymmetricMatrix(n, dtype=type(demands[0][2]))
 

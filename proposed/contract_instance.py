@@ -9,12 +9,13 @@ def contract_instance(n, routing, S, demands, capacities):
     """
     Creates a new, contracted instance of ring loading. Expects all demands in S to be mutually crossing.
     Takes O(n^2) time.
-    :param n:
-    :param routing:
+    :param n: ring size
+    :param routing: SymmetricMatrix containign current routing
     :param S: list of unrouted demands which are all mutually crossing
-    :param demands:
-    :param capacities:
-    :return:
+    :param demands: SymmetricMatrix containing demands
+    :param capacities: np.array containing edge capacities
+    :return: size of contracted instance, indices of unrouted demands, SymmetricMatrix containing new demands,
+    np.array containing new edge capacities
     """
     residual_capacities = compute_residual_capacities(n, routing, demands, capacities)
     remaining_demands = demands.copy()

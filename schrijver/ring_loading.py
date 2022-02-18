@@ -21,14 +21,21 @@ def ring_loading(n, demands):
 
     pi_routing, capacities, demands = partial_integer_routing(n, demands, demands_across_cuts, capacities)
 
-    demands_across_cuts = compute_demands_across_cuts(n, demands)
-
     routing = split_route_crossing_demands(n, pi_routing, demands, capacities)
 
     return routing
 
 
 def partial_integer_routing(n, demands, demands_across_cuts, capacities):
+    """
+    Computes a partial integer routing by routing parallel demands all front or all back until the remaining demands
+    are mutually crossing. Takes O(k n^2) time.
+    :param n:
+    :param demands:
+    :param demands_across_cuts:
+    :param capacities:
+    :return:
+    """
     tight_cuts = find_tight_cuts(n, demands_across_cuts, capacities)
     routing = SymmetricMatrix(n)
     while True:
@@ -53,6 +60,16 @@ def partial_integer_routing(n, demands, demands_across_cuts, capacities):
 
 
 def _route_demand_if_parallel(capacities, routing, demands, indices, value, cut):
+    """
+    Helper function that routes a demand parallel to the given cut if it is in fact parallel.
+    :param capacities: edge capacities
+    :param routing: current routing
+    :param demands: list of demands
+    :param indices: indices of demand to be routed
+    :param value: value of demand to be routed
+    :param cut: cut parallel to which the demand is to be routed
+    :return: new routing, new capacities, remaining demands
+    """
     i, j = indices
     g, h = cut
     if demand_parallel_to_cut((i, j), (g, h)):
@@ -106,7 +123,7 @@ def split_route_crossing_demands(n, routing, demands, capacities):
     :param routing: SymmetricMatrix containing th partial integer routing
     :param S: List of unrouted demands
     :param demands: SymmetricMatrix containing demands
-    :return:
+    :return: complete routing
     """
     for _ in range(len(demands)):
         demands_across_cuts = compute_demands_across_cuts(n, demands)

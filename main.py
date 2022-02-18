@@ -1,48 +1,34 @@
+import time
+
 import numpy as np
 
 import proposed.ring_loading as proposed
 import schrijver.ring_loading as schrijver
-from generate_instance import generate_random_instance
+from generate_instance import generate_random_instance, convert_demands_to_list
 from proposed.residual_capacities import compute_link_loads
 from sanity_checks import is_complete_routing, is_optimal_routing
 
 if __name__ == '__main__':
     n = 100
     seed = np.random.randint(0, 100000)
-    # seed = 43085  # n = 500
-    seed = 89786  # n = 250
     print(f'Seed: {seed}')
     demands = generate_random_instance(n=n, max_demand=100, sparsity=0.1, integer=True, seed=seed)
+    demands_list = convert_demands_to_list(n, demands)
+    print()
 
-    # pi_routing, S, capacities, demands_across_cuts, tight_cuts = partial_integer_routing(n, demands)
-    # print(f"Unrouted demands: {S}")
-    # print(f"Capacities: {capacities}")
-    # print(f"Tight cuts: {tight_cuts}")
-    # cc = check_cut_condition(n, demands_across_cuts, capacities)
-    # print(f"Cut condition fulfilled: {cc}")
-    # res_capacities = compute_residual_capacities(n, pi_routing, demands, capacities)
-    #
-    # remaining_demands = demands.copy()
-    # remaining_demands[np.where(pi_routing != UNROUTED)] = 0
-    # remaining_demands_across_cuts = compute_demands_across_cuts(n, remaining_demands)
-    # print(
-    #     f"Cut condition fulfilled for remaining demands: "
-    #     f"{check_cut_condition(n, remaining_demands_across_cuts, res_capacities)}")
-
-    demands_list = []
-    for i in range(n):
-        for j in range(i+1, n):
-            if demands[i, j] != 0:
-                demands_list.append((i, j, demands[i, j]))
-
-    print('Schrijver:')
+    print('Schrijver algorithm:')
+    time_start = time.time_ns()
     routing = schrijver.ring_loading(n, demands_list)
-    print(f'Link loads: {compute_link_loads(n, routing, demands)}')
-    print(f'Complete Routing: {is_complete_routing(routing)}')
-    print(f'Optimal Routing: {is_optimal_routing(n, demands, routing)}')
+    print('Computation took {:.2f}ms'.format((time.time_ns() - time_start) / 1e6))
+    print(f'Maximal edge load: {np.max(compute_link_loads(n, routing, demands))}')
+    print(f'Routing is complete: {is_complete_routing(routing)}')
+    print(f'Routing is optimal: {is_optimal_routing(n, demands, routing)}')
+    print()
 
     print('Proposed:')
+    time_start = time.time_ns()
     routing = proposed.ring_loading(n, demands)
-    print(f'Link loads: {compute_link_loads(n, routing, demands)}')
-    print(f'Complete Routing: {is_complete_routing(routing)}')
-    print(f'Optimal Routing: {is_optimal_routing(n, demands, routing)}')
+    print('Computation took {:.2f}ms'.format((time.time_ns() - time_start) / 1e6))
+    print(f'Maximal edge load: {np.max(compute_link_loads(n, routing, demands))}')
+    print(f'Routing is complete: {is_complete_routing(routing)}')
+    print(f'Routing is optimal: {is_optimal_routing(n, demands, routing)}')

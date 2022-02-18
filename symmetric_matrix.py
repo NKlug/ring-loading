@@ -1,8 +1,11 @@
 import numpy as np
 
 
-# TODO: Make this datatype safer. Currently slices of SymmetricMatrix are also of type SymmetricMatrix.
 class SymmetricMatrix(np.ndarray):
+    """
+    Custom implementation of a Symmetric Matrix that allows all numpy operations.
+    Warning: Some operations are somewhat unsafe, like writing slices crossing the main diagonal.
+    """
     def __new__(cls, n, initial_values=None, dtype=np.float32, *args, **kwargs):
         if initial_values is None:
             obj = np.zeros((n, n), dtype=dtype)

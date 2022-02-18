@@ -3,7 +3,7 @@ import numpy as np
 
 def compute_capacities(n, demands_across_cuts):
     """
-    Computes the capacities as given in the paper.
+    Computes the capacities as given in the paper. Takes O(n^2) time.
     :param n: ring size
     :param demands_across_cuts: SymmetricMatrix containing all demands across cuts.
     :return: np.array containing capacities

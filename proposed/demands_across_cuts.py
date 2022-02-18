@@ -5,10 +5,10 @@ from symmetric_matrix import SymmetricMatrix
 
 def compute_demands_across_cuts(n, demands):
     """
-    Computes the demands across all cuts using the recursion
+    Computes the demands across all cuts using the recursive equation. Takes O(n^2) time.
     :param n: ring size
-    :param demands: demands
-    :return:
+    :param demands: SymmetricMatrix containing demands
+    :return: SymmetricMatrix of demands across cuts
     """
     a = SymmetricMatrix(n, dtype=demands.dtype)
     D = SymmetricMatrix(n, dtype=demands.dtype)
@@ -29,14 +29,13 @@ def compute_demands_across_cuts(n, demands):
 
 def demands_across_cuts_edge_fixed(n, S, demands):
     """
-    Computes the demand across cuts for all cuts of the form {k, edge} with edge - n/2 <= k < edge.
+    Computes the demand across cuts for all cuts of the form {k, e} with e - n/2 <= k < e, where e is the unique edge
+    such that the cut {e-1, e} is crossed only by the first demand in S.
     Furthermore assumes the special case that all demands are crossing and that the given instance is contracted.
     :param S: sorted list of indices of remaining demands
-    :param edge:
-    :param demands:
-    :param n:
-
-    :return:
+    :param demands: SymmetricMatrix of demands
+    :param n: ring size
+    :return: np.array of demands across cuts
     """
     # assert that size is even - for contracted crossing instances, it always is
     assert n % 2 == 0
