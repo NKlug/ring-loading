@@ -1,7 +1,7 @@
 import numpy as np
 
 from constants import UNROUTED
-from residual_capacities import compute_residual_capacities
+from proposed.residual_capacities import compute_residual_capacities
 from symmetric_matrix import SymmetricMatrix
 
 

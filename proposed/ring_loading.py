@@ -4,15 +4,14 @@ import numpy as np
 
 from capacities import compute_capacities
 from constants import UNROUTED, FORWARD
-from cut_utils import demand_parallel_to_cut
-from demand_utils import find_unrouted_demands
 from proposed.contract_instance import contract_instance
 from proposed.demands_across_cuts import demands_across_cuts_edge_fixed, compute_demands_across_cuts
-from proposed.tight_cuts import find_tight_cuts
 from symmetric_matrix import SymmetricMatrix
+from utils.cut_utils import demand_parallel_to_cut, find_tight_cuts, determine_route_parallel_to_cut
+from utils.demand_utils import find_unrouted_demands
 
 
-def relaxed_ring_loading(n, demands):
+def ring_loading(n, demands):
     """
     Computes a minimal soulution to ring loading in O(n^2) time.
     :param n: ring size
@@ -71,14 +70,11 @@ def route_parallel_demands(n, tight_cuts):
         for i in range(n):
             j = next_unrouted[i]
             while i != j and demand_parallel_to_cut((i, j), (g, h)):
-                routing[i, j] = route_parallel_to_cut((i, j), (g, h))
+                routing[i, j] = determine_route_parallel_to_cut((i, j), (g, h))
                 j = (j + 1) % n
             next_unrouted[i] = j
 
     return routing
-
-
-
 
 
 def split_route_crossing_demands(n, routing, S, demands, capacities):

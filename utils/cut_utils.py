@@ -35,6 +35,7 @@ def find_tight_cuts(n, demands_across_cuts, capacities):
         tight_cuts[i] = j
     return tight_cuts
 
+
 def determine_route_parallel_to_cut(demand, cut):
     """
     Determines the route of a demand given a cut it is parallel to.

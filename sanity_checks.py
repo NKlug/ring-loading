@@ -2,7 +2,7 @@ import numpy as np
 
 from constants import FORWARD, UNROUTED
 from proposed.demands_across_cuts import compute_demands_across_cuts
-from residual_capacities import compute_link_loads
+from proposed.residual_capacities import compute_link_loads
 
 
 def check_cut_condition(n, demands_across_cuts, capacities):

@@ -1,20 +1,20 @@
 import numpy as np
 
+import schrijver.ring_loading as schrijver
 from generate_instance import generate_random_instance
-from proposed.ring_loading import partial_integer_routing, relaxed_ring_loading
-from residual_capacities import compute_link_loads
+from proposed.residual_capacities import compute_link_loads
 from sanity_checks import is_complete_routing, is_optimal_routing
 
 if __name__ == '__main__':
-    n = 100
+    n = 10
     seed = np.random.randint(0, 100000)
     # seed = 43085  # n = 500
     # seed = 89786  # n = 250
     print(f'Seed: {seed}')
     demands = generate_random_instance(n=n, max_demand=100, sparsity=0.1, integer=True, seed=seed)
 
-    pi_routing, S, capacities, demands_across_cuts, tight_cuts = partial_integer_routing(n, demands)
-    print(f"Unrouted demands: {S}")
+    # pi_routing, S, capacities, demands_across_cuts, tight_cuts = partial_integer_routing(n, demands)
+    # print(f"Unrouted demands: {S}")
     # print(f"Capacities: {capacities}")
     # print(f"Tight cuts: {tight_cuts}")
     # cc = check_cut_condition(n, demands_across_cuts, capacities)
@@ -28,7 +28,14 @@ if __name__ == '__main__':
     #     f"Cut condition fulfilled for remaining demands: "
     #     f"{check_cut_condition(n, remaining_demands_across_cuts, res_capacities)}")
 
-    routing = relaxed_ring_loading(n, demands)
+    demands_list = []
+    for i in range(n):
+        for j in range(i+1, n):
+            if demands[i, j] != 0:
+                demands_list.append((i, j, demands[i, j]))
+
+    routing = schrijver.ring_loading(n, demands_list)
+    # routing = proposed.ring_loading(n, demands)
     # print(routing)
     print(f'Link loads: {compute_link_loads(n, routing, demands)}')
     print(f'Complete Routing: {is_complete_routing(routing)}')
