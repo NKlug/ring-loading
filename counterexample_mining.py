@@ -2,7 +2,7 @@ import numpy as np
 from tqdm import tqdm
 
 from generate_instance import generate_random_instance
-from relaxed_ring_loading import partial_integer_routing
+from proposed.ring_loading import partial_integer_routing
 
 
 def find_many_unrouted_demands_instance(n, max_tries, max_demand, sparsity):
@@ -13,7 +13,7 @@ def find_many_unrouted_demands_instance(n, max_tries, max_demand, sparsity):
     :return:
     """
 
-    for i in tqdm(range(max_tries)):
+    for _ in tqdm(range(max_tries)):
         seed = np.random.randint(0, 1000 * max_tries)
         demands = generate_random_instance(n=n, max_demand=max_demand, sparsity=sparsity, integer=True, seed=seed)
 

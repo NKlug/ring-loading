@@ -3,7 +3,7 @@ import collections
 import numpy as np
 
 from capacities import compute_capacities
-from constants import UNROUTED, FORWARD, BACKWARD
+from constants import UNROUTED, FORWARD
 from cut_utils import demand_parallel_to_cut
 from demand_utils import find_unrouted_demands
 from proposed.contract_instance import contract_instance
@@ -14,10 +14,10 @@ from symmetric_matrix import SymmetricMatrix
 
 def relaxed_ring_loading(n, demands):
     """
-
-    :param n:
-    :param demands:
-    :return:
+    Computes a minimal soulution to ring loading in O(n^2) time.
+    :param n: ring size
+    :param demands: SymmetricMatrix containing demands
+    :return: SymmetricMatrix containing a minimal solution
     """
     # determine partial integer routing, set of unrouted demands S and capacities
     pi_routing, S, capacities, _, _ = partial_integer_routing(n, demands)
@@ -78,22 +78,6 @@ def route_parallel_demands(n, tight_cuts):
     return routing
 
 
-def route_parallel_to_cut(demand, cut):
-    """
-    Determines the route of a demand given a cut it is parallel to.
-    In O(1) time.
-    :param demand:
-    :param cut:
-    :return:
-    """
-    i, j = min(demand), max(demand)
-    g, h = min(cut), max(cut)
-    if j <= g or h < i or g < i < j <= h:
-        return FORWARD
-    elif i <= g and h < j:
-        return BACKWARD
-    else:
-        raise Exception('Demand not parallel to cut!')
 
 
 
