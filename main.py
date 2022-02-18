@@ -25,7 +25,7 @@ if __name__ == '__main__':
     print(f'Routing is optimal: {is_optimal_routing(n, demands, routing)}')
     print()
 
-    print('Proposed:')
+    print('Proposed algorithm:')
     time_start = time.time_ns()
     routing = proposed.ring_loading(n, demands)
     print('Computation took {:.2f}ms'.format((time.time_ns() - time_start) / 1e6))
