@@ -49,7 +49,7 @@ def partial_integer_routing(n, demands, demands_across_cuts, capacities):
         k, l = min(k, l), max(k, l)
         if k < i or (k == i and l < j):
             i, j, k, l = k, l, i, j
-        # now we have i < k
+        # now we have i < k or if i == k, j < l.
 
         g = find_edge_in_between((i, j), (k, l))
         h = tight_cuts[g]
