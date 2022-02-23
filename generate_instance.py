@@ -20,13 +20,16 @@ def generate_random_instance(n, max_demand, sparsity, integer=False, seed=None):
     if integer:
         a = a.astype(np.int)
     sym_matrix = SymmetricMatrix(n, initial_values=a)
-    zero_indices_1 = np.random.choice(np.arange(n, dtype=int), int(sparsity / 2 * n ** 2), replace=True)
-    zero_indices_2 = np.random.choice(np.arange(n, dtype=int), int(sparsity / 2 * n ** 2), replace=True)
-    sym_matrix[zero_indices_1, zero_indices_2] = 0
+
+    rng = np.random.default_rng()
+    zero_indices = rng.choice(n*(n-1)//2, int(sparsity * n*(n-1) / 2), replace=False)
+    triu_indices = np.asarray([(i, j) for i in range(n) for j in range(i+1, n)])
+    zero_indices = triu_indices[zero_indices]
+    sym_matrix[zero_indices[:, 0], zero_indices[:, 1]] = 0
     return sym_matrix
 
 
-def convert_demands_to_list(n, demands):
+def demands_to_list(n, demands):
     """
     Converts the demands in a SymmetricMatrix into a list of containing tuples of type (i, j, d_{ij}).
     The list only contains the non-zero demands.

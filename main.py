@@ -4,16 +4,16 @@ import numpy as np
 
 import proposed.ring_loading as proposed
 import schrijver.ring_loading as schrijver
-from generate_instance import generate_random_instance, convert_demands_to_list
+from generate_instance import generate_random_instance, demands_to_list
 from proposed.residual_capacities import compute_link_loads
-from sanity_checks import is_complete_routing, is_optimal_routing
+from utils.sanity_checks import is_complete_routing, is_optimal_routing
 
 if __name__ == '__main__':
-    n = 100
+    n = 10
     seed = np.random.randint(0, 100000)
     print(f'Seed: {seed}')
     demands = generate_random_instance(n=n, max_demand=100, sparsity=0.1, integer=True, seed=seed)
-    demands_list = convert_demands_to_list(n, demands)
+    demands_list = demands_to_list(n, demands)
     print()
 
     print('Schrijver algorithm:')
