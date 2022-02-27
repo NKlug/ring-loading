@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 from symmetric_matrix import SymmetricMatrix
 
@@ -42,4 +43,4 @@ def demands_to_list(n, demands):
         for j in range(i + 1, n):
             if demands[i, j] != 0:
                 demands_list.append((i, j, demands[i, j]))
-    return demands_list
+    return random.shuffle(demands_list)

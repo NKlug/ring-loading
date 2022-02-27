@@ -29,7 +29,7 @@ def runtime_test_schrijver(n, sparsity, seeds):
         time_start = time.time_ns()
         _ = schrijver.ring_loading(n, demands)
         time_end = time.time_ns()
-        results.append((seed, (time_end - time_start) / 1e6))
+        results.append((int(seed), float((time_end - time_start) / 1e6)))
 
     return results
 

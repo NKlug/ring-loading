@@ -15,6 +15,8 @@ if __name__ == '__main__':
             std_runtime = np.std(result_list[:, 1])
             runtime_averages[algo][key] = (mean_runtime, std_runtime)
 
+    pprint(runtime_averages)
+
     for i in [0, 0.2, 0.5, 0.9]:
         for algo in ['proposed', 'schrijver']:
             for j in [10, 20, 50, 100, 200]:

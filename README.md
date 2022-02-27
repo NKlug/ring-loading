@@ -11,9 +11,14 @@ In can be invoked using the function ``ring_loading(n, demands)``, where `demand
 The implementation of Schrijver et al.'s algorithm can be found in ``schrijver/ring_loading.py``, where it, too, can be invoked
 using the `ring_loading(n, demands)` function. Note that here, `demands` is a list containing all non-zero demands.
 
+## Experimental results
+
+Runtime experiments can be conducted using ``runtime_test.py`` in the ``experiments`` directory.
+The results given in [1] were derived from the computational results in ``result.json``, which contains tuples
+of type `(seed, time_ms)`.
 
 ## References
-[1] Nikolas Klug, 2022. _An Algorithm for Minimal Solutions to the Ring Loading
+[1] Nikolas Klug, 2022. _Computing Minimal Solutions to the Ring Loading
 Problem_. Term Paper.
 
 [2] Schrijver, A., Seymour, P. and Winkler, P., 1999. _The Ring Loading Problem_. SIAM review, 41(4), pp.777-791.
