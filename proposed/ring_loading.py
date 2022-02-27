@@ -29,6 +29,9 @@ def ring_loading(n, demands):
         else:
             pi_routing[i, j] = FORWARD
 
+    if len(pruned_S) == 0:
+        return pi_routing
+
     # Route remaining demands by splitting
     routing = split_route_crossing_demands(n, pi_routing, pruned_S, demands, capacities)
 
@@ -124,7 +127,7 @@ def split_route_crossing_demands(n, routing, S, demands, capacities):
                 min_slacks[l] = min(min_slacks[l], slacks_j[l - i])
 
         # find minimal slack along front route
-        min_slack = np.min(min_slacks[i:j - 1])  # O(n)
+        min_slack = np.min(min_slacks[i:j - 1], initial=0)  # O(n)
 
         # route demand (i, j)
         M = min(contracted_demands[i, j], min_slack / 2)
