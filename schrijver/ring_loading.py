@@ -49,6 +49,7 @@ def partial_integer_routing(n, demands, demands_across_cuts, capacities):
         k, l = min(k, l), max(k, l)
         if k < i or (k == i and l < j):
             i, j, k, l = k, l, i, j
+            d_ij, d_kl = d_kl, d_ij
         # now we have i < k or if i == k, j < l.
 
         g = find_edge_in_between((i, j), (k, l))
@@ -73,7 +74,7 @@ def _route_demand_if_parallel(capacities, routing, demands, indices, value, cut)
     i, j = indices
     g, h = cut
     if demand_parallel_to_cut((i, j), (g, h)):
-        demands.remove((*indices, value))
+        demands.remove((i, j, value))
         routing[i, j] = determine_route_parallel_to_cut((i, j), (g, h))
         if routing[i, j] == FORWARD:
             capacities[i:j] -= value
