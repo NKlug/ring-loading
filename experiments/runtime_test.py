@@ -16,7 +16,7 @@ def runtime_test_proposed(n, sparsity, seeds):
         time_start = time.time_ns()
         proposed.ring_loading(n, demands)
         time_end = time.time_ns()
-        results.append((seed, (time_end - time_start) / 1e6))
+        results.append((int(seed), int(time_end - time_start) / 1e6))
 
     return results
 
