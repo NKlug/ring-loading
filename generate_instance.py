@@ -30,10 +30,11 @@ def generate_random_instance(n, max_demand, sparsity, integer=False, seed=None):
     return sym_matrix
 
 
-def demands_to_list(n, demands):
+def demands_to_list(n, demands, seed=None):
     """
     Converts the demands in a SymmetricMatrix into a list of containing tuples of type (i, j, d_{ij}).
     The list only contains the non-zero demands.
+    :param seed: seed used for shuffling demand list
     :param n: ring size
     :param demands: SymmetricMatrix containing demands
     :return: list of non-zero demands
@@ -43,5 +44,6 @@ def demands_to_list(n, demands):
         for j in range(i + 1, n):
             if demands[i, j] != 0:
                 demands_list.append((i, j, demands[i, j]))
+    random.seed(seed)
     random.shuffle(demands_list)
     return demands_list

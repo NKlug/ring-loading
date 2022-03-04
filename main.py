@@ -13,7 +13,7 @@ if __name__ == '__main__':
     seed = np.random.randint(0, 100000)
     print(f'Seed: {seed}')
     demands = generate_random_instance(n=n, max_demand=100, sparsity=0.1, integer=True, seed=seed)
-    demands_list = demands_to_list(n, demands)
+    demands_list = demands_to_list(n, demands, seed)
     print()
 
     print('Schrijver algorithm:')

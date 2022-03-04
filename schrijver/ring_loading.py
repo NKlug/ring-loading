@@ -135,7 +135,7 @@ def split_route_crossing_demands(n, routing, demands, capacities):
         pairwise_capacities_sum = capacities[:, None] + capacities[None, :]
         cut_slacks = pairwise_capacities_sum - demands_across_cuts
 
-        m_front = np.min(cut_slacks[i:j - 1, i + 1:j], initial=0)  # this takes O(n^2)
+        m_front = 0 if i == j-1 else np.min(cut_slacks[i:j - 1, i + 1:j])  # this takes O(n^2)
         if d_ij <= m_front / 2:
             routing[i, j] = 1
             capacities[i:j] -= d_ij

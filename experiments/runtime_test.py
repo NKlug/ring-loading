@@ -25,7 +25,7 @@ def runtime_test_schrijver(n, sparsity, seeds):
     results = []
     for seed in seeds:
         demands = generate_random_instance(n=n, max_demand=100, sparsity=sparsity, integer=True, seed=seed)
-        demands = demands_to_list(n, demands)
+        demands = demands_to_list(n, demands, seed)
         time_start = time.time_ns()
         _ = schrijver.ring_loading(n, demands)
         time_end = time.time_ns()
