@@ -18,7 +18,7 @@ The results given in [1] were derived from the computational results in ``result
 of type `(seed, time_ms)`.
 
 ## References
-[1] Nikolas Klug, 2022. _Computing Minimal Solutions to the Ring Loading
-Problem_. Term Paper.
+[1] Nikolas Klug, 2024. _Computing Minimal Solutions to the Ring Loading
+Problem_. Information Processing Letters, Volume 185.
 
 [2] Schrijver, A., Seymour, P. and Winkler, P., 1999. _The Ring Loading Problem_. SIAM review, 41(4), pp.777-791.
